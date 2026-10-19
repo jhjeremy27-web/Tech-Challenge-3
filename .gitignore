@@ -1,0 +1,48 @@
+# Terraform working directory
+**/.terraform/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform variable files
+*.tfvars
+*.tfvars.json
+
+# Terraform plan files
+*.tfplan
+tfplan
+tfplan.*
+
+# Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# SSH private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Ansible retry files
+*.retry
+
+# macOS
+.DS_Store
+
+# Editor configuration
+.vscode/
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
