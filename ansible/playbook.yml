@@ -1,0 +1,10 @@
+
+---
+- name: Configure Tech Challenge 3 web server
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Verify Ansible connectivity
+      ansible.builtin.ping:

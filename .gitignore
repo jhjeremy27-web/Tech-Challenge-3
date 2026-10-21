@@ -33,6 +33,9 @@ terraform.rc
 *.p12
 *.pfx
 
+# Ansible inventory (contains environment-specific configuration)
+ansible/inventory.ini
+
 # Ansible retry files
 *.retry
 
