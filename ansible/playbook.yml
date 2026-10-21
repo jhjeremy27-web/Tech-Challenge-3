@@ -6,5 +6,67 @@
   gather_facts: true
 
   tasks:
-    - name: Verify Ansible connectivity
-      ansible.builtin.ping:
+    - name: Install Nginx
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Ensure Nginx is enabled and running
+      ansible.builtin.systemd_service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Deploy Hello World webpage
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Check whether firewalld is installed
+      ansible.builtin.command:
+        cmd: rpm -q firewalld
+      register: firewalld_package
+      changed_when: false
+      failed_when: false
+
+    - name: Check whether firewalld is active
+      ansible.builtin.command:
+        cmd: systemctl is-active firewalld
+      register: firewalld_status
+      changed_when: false
+      failed_when: false
+      when: firewalld_package.rc == 0
+
+    
+    - name: Check whether HTTP is allowed through firewalld
+      ansible.builtin.command:
+        cmd: firewall-cmd --permanent --query-service=http
+      register: firewall_http_check
+      changed_when: false
+      failed_when: firewall_http_check.rc not in [0, 1]
+      when:
+        - firewalld_package.rc == 0
+        - firewalld_status.stdout == "active"
+
+    - name: Allow HTTP through active firewalld
+      ansible.builtin.command:
+        cmd: firewall-cmd --permanent --add-service=http
+      register: firewall_http
+      changed_when: true
+      when:
+        - firewalld_package.rc == 0
+        - firewalld_status.stdout == "active"
+        - firewall_http_check.rc == 1
+
+    - name: Reload firewalld when HTTP rule changes
+      ansible.builtin.command:
+        cmd: firewall-cmd --reload
+      when: firewall_http is changed
+
+    - name: Validate Nginx configuration
+      ansible.builtin.command:
+        cmd: nginx -t
+      changed_when: false
